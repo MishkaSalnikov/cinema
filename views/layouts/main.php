@@ -42,6 +42,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'админка', 'url' => ['/movie/index'], 'visible' => !Yii::$app->user->isGuest, 'linkOptions' => ['class' => 'border border-primary rounded-start'] ], //для всех кроме гостей
+            ['label' => 'добавление фильма', 'url' => ['/movie/create'], 'visible' => !Yii::$app->user->isGuest, 'linkOptions' => ['class' => 'border border-primary rounded-end'] ], //для всех кроме гостей
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

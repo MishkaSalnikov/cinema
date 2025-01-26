@@ -3,28 +3,15 @@
 namespace app\models;
 
 use yii\db\ActiveRecord;
+use kartik\datetime\DateTimePicker;
 
 class Movie extends ActiveRecord
-{
-    /**
-     * Указываем имя таблицы в базе данных.
-     */
+{   
     public static function tableName()
     {
         return 'movie'; // Таблица в БД
     }
-
-    /**
-     * Правила валидации для модели.
-     */
-    /*public function rules()
-    {
-        return [
-            [['title', 'genre', 'release_date'], 'required'], // Поля обязательны для заполнения
-            [['title', 'genre'], 'string', 'max' => 255],    // Строки, максимум 255 символов
-            [['release_date'], 'date', 'format' => 'php:Y-m-d'], // Дата в формате Y-m-d
-        ];
-    }*/
+   
     public function rules()
     {
         return [
@@ -38,7 +25,24 @@ class Movie extends ActiveRecord
             'minHeight' => 300, 'maxHeight' => 3000,
             ],
         ];
-    }
+    }    
+}
 
-    
+
+class MovieSession extends ActiveRecord
+{   
+    public static function tableName()
+    {
+        return 'movie_session'; // Таблица в БД
+    }
+   
+    public function rules()
+    {
+        return [
+            [['movie_id', 'date_time', 'price'], 'required'],
+            [['movie_id'], 'integer'],
+            [['date_time'], 'string', 'max' => 1000],
+            [['price'], 'integer', 'max' => 1000],            
+        ];
+    }    
 }

@@ -6,4 +6,5 @@ return [
     'senderName' => 'Example.com mailer',
     'uploadPath' => '@webroot/frontend/upload/film/',
     'uploadPathUrl' => '/frontend/upload/film/',
+    'bsVersion' => '5.x',
 ];

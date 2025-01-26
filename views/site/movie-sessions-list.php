@@ -7,9 +7,7 @@
         <tr>
             <th>ID</th>
             <th>Изображение</th>
-            <th>
-                
-            </ht>
+            <th>Информация</th>
         </tr>
     </thead>
     <tbody>

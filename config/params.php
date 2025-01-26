@@ -5,4 +5,5 @@ return [
     'senderEmail' => 'noreply@example.com',
     'senderName' => 'Example.com mailer',
     'uploadPath' => '@webroot/frontend/upload/film/',
+    'uploadPathUrl' => '/frontend/upload/film/',
 ];

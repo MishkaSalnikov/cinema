@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\MovieSessionsList;
 
 class SiteController extends Controller
 {
@@ -61,7 +62,15 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        // movie_session + movie
+        $movieSessionsList = MovieSessionsList::find()
+        ->with('movie') // Загрузка связанной модели
+        ->orderBy(['date_time' => SORT_ASC]) // Сортировка по возрастанию даты
+        ->all();
+    
+        return $this->render('index', [
+            'movieSessionsList' => $movieSessionsList,
+        ]);
     }
 
     /**

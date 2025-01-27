@@ -7,7 +7,7 @@ use yii\web\Controller;
 use app\models\Movie;
 use app\models\MovieSession;
 use yii\web\UploadedFile;
-use yii\helpers\ArrayHelper;
+use app\models\MovieSessionsList;
 use Yii;
 
 class MovieController extends Controller
@@ -16,50 +16,52 @@ class MovieController extends Controller
     public function actionCreate()
     {
         $model = new Movie();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) { // если пришел POST
-            
+        $movieSession = new MovieSession();
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) { //картинка + добавление фильма
             if ($model->save(false)) {
                 $uploadedFile = UploadedFile::getInstance($model, 'pict');
-                if ($uploadedFile) {
-                    $fileName = $model->id . '.' . $uploadedFile->getExtension(); // получаем ID внесенного фильма для имени файла
-                    $uploadPath = Yii::getAlias(Yii::$app->params['uploadPath']); 
-                    $filePath = $uploadPath . $fileName;
-
-                    if ($uploadedFile->saveAs($filePath)) { // сохраняем картинку
-                        $model->pict = $uploadedFile->getExtension(); // пихаем расширение в БД
-                        $model->save(false); //без проверки т.к. в модели проверка
-                    }
-                }
-                return $this->redirect(['index']); // редирект на movie/index
+                $model->saveUploadedImage($uploadedFile);
+                return $this->redirect(['films']);
             }
         }
 
-        $movies = Movie::find()
-            ->select(['id', 'title'])
-            ->asArray()
-            ->all();
-        $moviesList = ArrayHelper::map($movies, 'id', 'title');
-        
-        
-        
-        
-        $movieSession = new MovieSession();
-        
-        if ($movieSession->load(Yii::$app->request->post()) && $movieSession->save()) {
+        if ($movieSession->load(Yii::$app->request->post()) && $movieSession->save()) { //сохр в бд сеанса и редирект
             return $this->redirect(['index']);
         }
 
         return $this->render('create', [
             'movieSession' => $movieSession,
-            'movies' => $movies, 
+            'movies' => Movie::getMoviesList(),
             'model' => $model,
-            'moviesList' => $moviesList,
         ]);
     }
 
     public function actionIndex()
     {
-        return $this->render('index');
+        // movie_session + movie
+        return $this->render('index', [
+            'movieSessionsList' => MovieSessionsList::getSessionsWithMovies(),
+        ]);
+    }
+
+    public function actionFilms()
+    {
+        return $this->render('films', [
+            'moviesList' => Movie::find()->indexBy('id')->all(),
+        ]);
+    }
+
+    public function actionDeleteMovie($id)
+    {
+        try {
+            Movie::deleteMovieWithSessions($id);
+            Yii::$app->session->setFlash('success', 'Фильм и связанные сеансы успешно удалены.');
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
+        }
+
+        return $this->redirect(['movie/films']);
     }
 
     public function behaviors() // Запрет гостям
@@ -74,7 +76,7 @@ class MovieController extends Controller
                     ],
                     [
                         'allow' => false,
-                        'roles' => ['?'], 
+                        'roles' => ['?'],
                     ],
                 ],
             ],

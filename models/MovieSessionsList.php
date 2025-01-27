@@ -17,4 +17,12 @@ class MovieSessionsList extends ActiveRecord
     }
 
 
+
+    public static function getSessionsWithMovies()
+    {
+        return self::find()
+            ->with('movie')
+            ->orderBy(['date_time' => SORT_ASC])
+            ->all();
+    }
 }

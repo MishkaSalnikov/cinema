@@ -14,16 +14,17 @@ $this->title = 'Добавить новый фильм';
 
 <h1><?= Html::encode($this->title) ?></h1>
 
+<?php $isUpdateSession = strpos($_SERVER['REQUEST_URI'], '/update-session?') !== false; ?>
 
 
 <div class="accordion" id="accordionExample">
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingOne">
-      <button class="accordion-button bg-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+      <button class="accordion-button bg-primary <?= $isUpdateSession ? 'collapsed' : '' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="<?= $isUpdateSession ? 'false' : 'true' ?>" aria-controls="collapseOne">
         Добавить фильм
       </button>
     </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+    <div id="collapseOne" class="accordion-collapse collapse <?= $isUpdateSession ? '' : 'show' ?>" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body">
         <div class="row">
           <div class="movie-form col-lg-6 mx-auto"> <!-- форма добавления фильма ----------------------->
@@ -42,35 +43,36 @@ $this->title = 'Добавить новый фильм';
       </div>
     </div>
   </div>
-  
+
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingTwo">
-      <button class="accordion-button collapsed bg-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        Добавить сеанс
+      <button class="accordion-button <?= $isUpdateSession ? '' : 'collapsed' ?> bg-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="<?= $isUpdateSession ? 'true' : 'false' ?>" aria-controls="collapseTwo">
+        <?= $isUpdateSession ? 'Изменить' : 'Добавить' ?> сеанс
       </button>
     </h2>
-    
-    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+
+    <div id="collapseTwo" class="accordion-collapse collapse <?= $isUpdateSession ? 'show' : '' ?>" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-    
+
         <div class="row"> <!-- форма добавления сеанса ----------------------->
-          <div class="movie-form col-lg-6 mx-auto"> 
+          <div class="movie-form col-lg-6 mx-auto">
+            <p><?php print_r(date('Y-m-d H:i')); ?></p>
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($movieSession, 'movie_id')->dropDownList(
-              $moviesList, // массив 
+              $movies, // массив 
               ['prompt' => 'Выберите фильм']
-              )->label('Фильм') ?>
+            )->label('Фильм') ?>
             <?
-              $movieSession->date_time = '2025-05-01 12:00';
-              echo $form->field($movieSession, 'date_time')->widget(DateTimePicker::class, [
-              'options' => ['placeholder' => 'Дата и время сеанса...'],    
-              'type' => DateTimePicker::TYPE_COMPONENT_APPEND,    
+            $movieSession->date_time = '2025-05-01 12:00';
+            echo $form->field($movieSession, 'date_time')->widget(DateTimePicker::class, [
+              'options' => ['placeholder' => 'Дата и время сеанса...'],
+              'type' => DateTimePicker::TYPE_COMPONENT_APPEND,
               'pluginOptions' => [
                 'autoclose' => true,
                 'format' => 'yyyy-mm-dd hh:ii',
-                'startDate' => date('Y-m-d H:i'), // Сегодня
-                ],
-              ]);
+                'startDate' => date('Y-m-d H:i'), // Сегодня не работает... :(
+              ],
+            ]);
             ?>
             <?= $form->field($movieSession, 'price')->textInput(['maxlength' => true])->label('Цена билета') ?>
             <div class="form-group">

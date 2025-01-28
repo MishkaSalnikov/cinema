@@ -85,3 +85,11 @@ $this->title = 'Добавить новый фильм';
     </div>
   </div>
 </div>
+
+<pre>
+<?php
+print_r($movies);
+print_r($movieSession);
+?>
+
+</pre>

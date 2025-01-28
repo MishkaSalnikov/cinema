@@ -54,7 +54,7 @@ $this->title = 'My Yii Application';
                 </td>
                 <td>
                   <?php
-                  echo Html::a('Редактировать', ['movie/update', 'id' => $movie->id], [
+                  echo Html::a('Редактировать', ['movie/update-movie', 'id' => $movie->id], [
                     'class' => 'btn btn-primary btn-sm'
                   ]);
 
@@ -78,7 +78,7 @@ $this->title = 'My Yii Application';
         </table>
 
         <?php
-        print_r($moviesList);
+        //print_r($moviesList);
         ?>
 
 

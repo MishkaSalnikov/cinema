@@ -8,32 +8,34 @@ use app\models\Movie;
 use app\models\MovieSession;
 use yii\web\UploadedFile;
 use app\models\MovieSessionsList;
+use yii\web\NotFoundHttpException;
 use Yii;
 
 class MovieController extends Controller
 {
 
-    public function actionCreate()
+    public function actionCreateMovie()
     {
         $model = new Movie();
-        $movieSession = new MovieSession();
+        $movies = Movie::getMoviesList();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) { //картинка + добавление фильма
+
+
+        // Обработка формы создания фильма
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->save(false)) {
+                // Обработка изображения
                 $uploadedFile = UploadedFile::getInstance($model, 'pict');
                 $model->saveUploadedImage($uploadedFile);
+
                 return $this->redirect(['films']);
             }
         }
 
-        if ($movieSession->load(Yii::$app->request->post()) && $movieSession->save()) { //сохр в бд сеанса и редирект
-            return $this->redirect(['index']);
-        }
-
-        return $this->render('create', [
-            'movieSession' => $movieSession,
-            'movies' => Movie::getMoviesList(),
+        return $this->render('create-movie', [
             'model' => $model,
+            'movies' => $movies,
+
         ]);
     }
 
@@ -63,6 +65,49 @@ class MovieController extends Controller
 
         return $this->redirect(['movie/films']);
     }
+
+
+
+
+
+    public function actionUpdateMovie($id)
+    {
+        $movie = Movie::findOne($id);
+        if (!$movie) {
+            throw new NotFoundHttpException('Фильм не найден.');
+        }
+
+        // Если данные отправлены
+        if ($movie->load(Yii::$app->request->post())) {
+            // Загрузка файла
+            $uploadedFile = UploadedFile::getInstance($movie, 'pict');
+
+            if ($movie->save()) {
+                // Если есть загруженный файл, сохраняем его
+                if ($uploadedFile) {
+                    $movie->saveUploadedImage($uploadedFile);
+                }
+
+                Yii::$app->session->setFlash('success', 'Фильм успешно обновлён.');
+                return $this->redirect(['movie/films']);
+            }
+        }
+
+        // Отображаем форму редактирования
+        return $this->render('create-movie', [
+            'model' => $movie, // Передаём существующую модель
+            'movie' => $movie, // Передаём данные фильма
+        ]);
+    }
+
+
+
+
+
+
+
+
+
 
     public function behaviors() // Запрет гостям
     {

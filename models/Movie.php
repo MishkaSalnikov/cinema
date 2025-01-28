@@ -98,6 +98,11 @@ class Movie extends ActiveRecord
         return ArrayHelper::map($movies, 'id', 'title');
     }
 
+    public static function getMovie($id)
+    {
+        return self::findOne($id);
+    }
+
 
 
     public function behaviors()

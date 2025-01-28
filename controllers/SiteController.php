@@ -62,12 +62,14 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $currentDateTime = date('Y-m-d H:i:s');
         // movie_session + movie
         $movieSessionsList = MovieSessionsList::find()
-        ->with('movie') // Загрузка связанной модели
-        ->orderBy(['date_time' => SORT_ASC]) // Сортировка по возрастанию даты
-        ->all();
-    
+            ->with('movie') // Загрузка связанной модели
+            ->where(['>=', 'date_time', $currentDateTime])
+            ->orderBy(['date_time' => SORT_ASC]) // Сортировка по возрастанию даты
+            ->all();
+
         return $this->render('index', [
             'movieSessionsList' => $movieSessionsList,
         ]);

@@ -67,15 +67,28 @@ class MovieSession extends ActiveRecord
 
         // Проверка пересечений, исключая текущий сеанс
         $overlappingSessions = self::find()
-            ->where(['movie_id' => $this->movie_id])
-            ->andWhere(['not', ['id' => $this->movie_id]]) // Исключаем текущий
+            ->where(['movie_id' => $this->movie_id]) // Фильтруем по фильму
+            ->andWhere(['not', ['id' => $this->id]]) // Исключаем текущий сеанс
             ->andWhere([
                 'or',
+                // 1. Сеанс начинается в заданном промежутке
                 ['and', ['<=', 'date_time', $formattedEnd], ['>=', 'date_time', $formattedStart]],
-                ['and', ['<=', 'DATE_ADD(date_time, INTERVAL :duration MINUTE)', $formattedEnd], ['>=', 'DATE_ADD(date_time, INTERVAL :duration MINUTE)', $formattedStart]],
+                // 2. Сеанс заканчивается в заданном промежутке
+                [
+                    'and',
+                    ['<=', new \yii\db\Expression('DATE_ADD(date_time, INTERVAL :duration MINUTE)'), $formattedEnd],
+                    ['>=', new \yii\db\Expression('DATE_ADD(date_time, INTERVAL :duration MINUTE)'), $formattedStart]
+                ],
+                // 3. Сеанс полностью перекрывает промежуток
+                [
+                    'and',
+                    ['<=', 'date_time', $formattedStart],
+                    ['>=', new \yii\db\Expression('DATE_ADD(date_time, INTERVAL :duration MINUTE)'), $formattedEnd]
+                ],
             ])
             ->addParams([':duration' => $movieDuration])
             ->exists();
+
 
         if ($overlappingSessions) {
             $this->addError($attribute, 'Сеанс пересекается с другим или не выдержан интервал в 30 минут.');
